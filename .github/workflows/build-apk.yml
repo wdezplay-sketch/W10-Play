@@ -1,0 +1,41 @@
+name: Build W10 Play APK
+
+on:
+  push:
+    branches:
+      - main
+      - principal
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout do código
+        uses: actions/checkout@v4
+
+      - name: Configurar Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 17
+
+      - name: Verificar arquivos
+        run: |
+          echo "📂 Conteúdo da raiz:"
+          ls -la
+          echo "📂 Conteúdo da pasta app:"
+          ls -la app || true
+
+      - name: Conceder permissão ao Gradle
+        run: chmod +x gradlew
+
+      - name: Build APK Debug
+        run: ./gradlew app:assembleDebug
+
+      - name: Upload do APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: W10-Play-APK
+          path: app/build/outputs/apk/debug/*.apk
